@@ -1,64 +1,44 @@
-<template
-  ><el-autocomplete
-    popper-class="my-autocomplete"
+<template>
+  <el-autocomplete
     v-model="state"
     :fetch-suggestions="querySearch"
+    popper-class="my-autocomplete"
     placeholder="Please input"
     @select="handleSelect"
   >
-    <template v-slot="{ item }">
+    <template #suffix>
+      <i class="el-icon-edit el-input__icon" @click="handleIconClick"></i>
+    </template>
+    <template #default="{ item }">
       <div class="value">{{ item.value }}</div>
       <span class="link">{{ item.link }}</span>
     </template>
   </el-autocomplete>
 </template>
-<style>
-.my-autocomplete {
-  li {
-    line-height: normal;
-    padding: 7px;
-
-    .value {
-      text-overflow: ellipsis;
-      overflow: hidden;
-    }
-    .link {
-      font-size: 12px;
-      color: #b4b4b4;
-    }
-  }
-}
-</style>
 
 <script>
-export default {
-  compatConfig: {
-    MODE: 3 // opt-in to Vue 3 behavior for this component only
-  },
+import { defineComponent, ref, onMounted } from "vue";
 
-  data() {
-    return {
-      links: [],
-      state: ""
-    };
-  },
-  methods: {
-    querySearch(queryString, cb) {
-      var links = this.links;
-      var results = queryString
-        ? links.filter(this.createFilter(queryString))
-        : links;
+export default defineComponent({
+  setup() {
+    const links = ref([]);
+
+    const querySearch = (queryString, cb) => {
+      const results = queryString
+        ? links.value.filter(createFilter(queryString))
+        : links.value;
       // call callback function to return suggestion objects
       cb(results);
-    },
-    createFilter(queryString) {
-      return link => {
+    };
+    const createFilter = queryString => {
+      return restaurant => {
         return (
-          link.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0
+          restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) ===
+          0
         );
       };
-    },
-    loadAll() {
+    };
+    const loadAll = () => {
       return [
         { value: "vue", link: "https://github.com/vuejs/vue" },
         { value: "element", link: "https://github.com/ElemeFE/element" },
@@ -68,16 +48,46 @@ export default {
         { value: "vue-router", link: "https://github.com/vuejs/vue-router" },
         { value: "babel", link: "https://github.com/babel/babel" }
       ];
-    },
-    handleSelect(item) {
+    };
+    const handleSelect = item => {
       console.log(item);
-    },
-    handleIconClick(ev) {
+    };
+
+    const handleIconClick = ev => {
       console.log(ev);
-    }
-  },
-  mounted() {
-    this.links = this.loadAll();
+    };
+
+    onMounted(() => {
+      links.value = loadAll();
+    });
+
+    return {
+      links,
+      state: ref(""),
+      querySearch,
+      createFilter,
+      loadAll,
+      handleSelect,
+      handleIconClick
+    };
   }
-};
+});
 </script>
+
+<style>
+.my-autocomplete li {
+  line-height: normal;
+  padding: 7px;
+}
+.my-autocomplete li .name {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.my-autocomplete li .addr {
+  font-size: 12px;
+  color: #b4b4b4;
+}
+.my-autocomplete li .highlighted .addr {
+  color: #ddd;
+}
+</style>
