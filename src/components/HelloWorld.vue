@@ -6,13 +6,7 @@
     placeholder="Please input"
     @select="handleSelect"
   >
-    <i
-      class="el-icon-edit el-input__icon"
-      slot="suffix"
-      @click="handleIconClick"
-    >
-    </i>
-    <template slot-scope="{ item }">
+    <template v-slot="{ item }">
       <div class="value">{{ item.value }}</div>
       <span class="link">{{ item.link }}</span>
     </template>
